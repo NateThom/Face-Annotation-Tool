@@ -96,10 +96,6 @@ class InteractiveViewer(object):
 
     Used by: run
 
-    fill_default_coords: Set default coordinates in case user does not provide a label.
-
-    used by: save_annotations
-
     save_annotations: Write the labels to stdout and output file.
 
     Used by: run
@@ -109,6 +105,7 @@ class InteractiveViewer(object):
     """
 
     def __init__(self, img_path):
+
         self.img_path = img_path
         self.key_pressed = False
         self.key_event = None
@@ -1106,11 +1103,20 @@ class InteractiveViewer(object):
         for i in range(69):
             for j in range(2):
                 try:
-                    print(f",{self.coords_list[i][j]}",end="")
-                    f_winner.write(f",{self.coords_list[i][j]}")
+                    if i > 0:
+                        print(f",{self.coords_list[i][j]}", end="")
+                        f_winner.write(f",{self.coords_list[i][j]}")
+                    # elif self.bounding_box is True:
+                    #     print(f",{self.coords_list[i][j]}",end="")
+                    #     f_winner.write(f",{self.coords_list[i][j]}")
                 except:
-                    print(",(-1,-1)", end="")
-                    f_winner.write(",(-1,-1)")
+                    if i > 0:
+                        print(",(-1,-1)", end="")
+                        f_winner.write(",(-1,-1)")
+                    # elif self.bounding_box is True:
+                    #     print(",(-1,-1)", end="")
+                    #     f_winner.write(",(-1,-1)")
+
         print()
         f_winner.write("\n")
 
@@ -1147,6 +1153,7 @@ def parse_arguments():
                             help='dir with images')
     base_group.add_argument('-i', '--img', type=str,
                             help='single image')
+    # base_group.add_argument('-b', '--bounding_box')
     parser.add_argument('-n', '--nimgs', type=int,
                         help='number of images for -d mode', default=1)
 
@@ -1160,7 +1167,6 @@ def parse_arguments():
 def main(args):
     if args.dirimgs is not None:
         flist = sorted(os.listdir(args.dirimgs))
-
         for curr_file in flist:  # [::len(flist) // args.nimgs][:args.nimgs]:
             img_path = os.path.join(args.dirimgs, curr_file)
             viewer = InteractiveViewer(img_path)
